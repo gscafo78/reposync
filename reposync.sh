@@ -109,6 +109,26 @@ display_status() {
     echo "Status display completed."
 }
 
+# Function to list and view log files
+log() {
+    echo "Listing log files..."
+    log_files=("$LOG_DIR"/*.log)
+    if [[ ${#log_files[@]} -eq 0 ]]; then
+        echo "No log files found."
+        return
+    fi
+
+    for i in "${!log_files[@]}"; do
+        echo "$((i+1)). ${log_files[$i]}"
+    done
+
+    read -p "Enter the number of the log file to view: " log_number
+    if [[ $log_number -gt 0 && $log_number -le ${#log_files[@]} ]]; then
+        tail -f "${log_files[$((log_number-1))]}"
+    else
+        echo "Invalid selection."
+    fi
+}
 
 # Function to handle command-line arguments
 handle_arguments() {
@@ -123,8 +143,11 @@ handle_arguments() {
         status)
             display_status
             ;;
+        log)
+            log
+            ;;
         *)
-            echo "Usage: $0 {start|stop|status}"
+            echo "Usage: $0 {start|stop|status|log}"
             exit 1
             ;;
     esac
@@ -140,7 +163,7 @@ main() {
 
 # Handle command-line arguments
 if [[ $# -eq 0 ]]; then
-    echo "No arguments supplied. Usage: $0 {start|stop|status}"
+    echo "No arguments supplied. Usage: $0 {start|stop|status|log}"
     exit 1
 fi
 
